@@ -1,0 +1,33 @@
+# Ignore raw data
+data/raw/*
+!data/raw/.gitkeep
+
+# Ignore processed data
+data/processed/*
+!data/processed/.gitkeep
+
+# Ignore charts
+charts/*
+!charts/.gitkeep
+
+# Ignore model artifacts
+api/*.joblib
+api/*.pkl
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+
+# Ignore notebooks checkpoints
+.ipynb_checkpoints/
+
+# Ignore virtual environments
+venv/
+.env/
+
+# Ignore system files
+.DS_Store
+Thumbs.db

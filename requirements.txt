@@ -1,0 +1,25 @@
+# Core Data Science
+pandas
+numpy
+scikit-learn
+joblib
+
+# Visualization
+matplotlib
+seaborn
+
+# API
+fastapi
+uvicorn
+
+# Optional (for model explainability)
+shap
+
+# Jupyter (if using notebooks)
+jupyter
+openpyxl
+imblearn
+xgboost
+lightgbm
+catboost
+schemas
