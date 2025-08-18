@@ -1,4 +1,3 @@
-# src/features.py
 from __future__ import annotations
 import numpy as np
 import pandas as pd
@@ -18,13 +17,22 @@ def add_log_transforms(df: pd.DataFrame) -> pd.DataFrame:
 
 def add_ratios(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
+
+    # ✅ Compute DTI ratio if not already available
+    if "LoanAmount" in df.columns and "Income" in df.columns:
+        df["DTIRatio"] = df["LoanAmount"] / df["Income"].replace(0, np.nan)
+        df["DTIRatio"] = df["DTIRatio"].fillna(0)
+
+    # Loan-to-Income
     if "LoanAmount" in df.columns and "Income" in df.columns:
         df["LTI"] = df["LoanAmount"] / df["Income"].replace(0, np.nan)
         df["LTI"] = df["LTI"].fillna(0)
 
+    # Payment-to-Income
     if all(col in df.columns for col in ["LoanAmount", "InterestRate", "Income"]):
         df["PTI"] = (df["LoanAmount"] * (1 + df["InterestRate"] / 100)) / df["Income"].replace(0, np.nan)
         df["PTI"] = df["PTI"].fillna(0)
+
     return df
 
 
@@ -34,7 +42,13 @@ def bin_credit_score(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     bins = [300, 500, 650, 750, 850]
     labels = ["Poor", "Fair", "Good", "Excellent"]
-    df["CreditScoreBand"] = pd.cut(df["CreditScore"], bins=bins, labels=labels, right=True, include_lowest=True)
+    df["CreditScoreBand"] = pd.cut(
+        df["CreditScore"],
+        bins=bins,
+        labels=labels,
+        right=True,
+        include_lowest=True,
+    )
     return df
 
 
@@ -44,7 +58,13 @@ def bin_age(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     bins = [18, 25, 35, 45, 55, 69]
     labels = ["18-25", "26-35", "36-45", "46-55", "56-69"]
-    df["AgeBand"] = pd.cut(df["Age"], bins=bins, labels=labels, right=True, include_lowest=True)
+    df["AgeBand"] = pd.cut(
+        df["Age"],
+        bins=bins,
+        labels=labels,
+        right=True,
+        include_lowest=True,
+    )
     return df
 
 
@@ -53,7 +73,6 @@ def bin_age(df: pd.DataFrame) -> pd.DataFrame:
 # -----------------------------
 def add_interactions(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    # Avoid division by zero
     df["LoanTerm_safe"] = df["LoanTerm"].replace(0, 1)
 
     df["EMI"] = df["LoanAmount"] / df["LoanTerm_safe"]
@@ -73,7 +92,7 @@ def add_interactions(df: pd.DataFrame) -> pd.DataFrame:
 # -----------------------------
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df = add_log_transforms(df)
-    df = add_ratios(df)
+    df = add_ratios(df)          # ✅ ensures DTIRatio, LTI, PTI
     df = bin_credit_score(df)
     df = bin_age(df)
     df = add_interactions(df)
@@ -81,4 +100,5 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     # Drop LoanID if present
     if "LoanID" in df.columns:
         df = df.drop(columns=["LoanID"])
+
     return df
